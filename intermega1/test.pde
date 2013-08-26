@@ -65,14 +65,14 @@ void setup() {
 	pinMode(PIN2, INPUT);	
 	
 	//sensors
-	PCpin(A8);
+	PCpin(A8);//62
 	PCpin(A9);
 	PCpin(A10);
 	PCpin(A11);
 	PCpin(A12);
 	PCpin(A13);
 	PCpin(A14);
-	PCpin(A15);
+	PCpin(A15);//69
 	
 	//inputs
 	PCpin(50);
@@ -125,7 +125,9 @@ void loop() {
 	if(myPIDA.Compute())
 	{
 		Serial.print("pided ");
-		Serial.println(Output);
+		Serial.print(Output);
+		Serial.print(" ");
+		Serial.println(Input);
 	}
 	myPIDB.Compute();
 	myPIDC.Compute();
@@ -148,10 +150,12 @@ void loop() {
 			Serial.print(" is ");
 			Serial.print(interrupt_count[i]);Serial.print(" ");Serial.print(interrupt_start[i]);
 			Serial.print(" ");
-			Input = interrupt_count[i]/10;
+			
 		}
 		
 	}
+	Input = interrupt_count[52]/10;
+	
 	CRCArduinoFastServos::writeMicroseconds(SERVO_STEERING,interrupt_start[62]);
 	Serial.print(" \n");
 }
