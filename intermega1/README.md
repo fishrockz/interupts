@@ -7,7 +7,7 @@ this is a simple scripts with all the basics running at the same time as a prouf
 relise on 
 
 	the arduino interupt driven pin change libary
-		PinChangeInt 
+		PinChangeInt (Version 2.19 (beta) Tue Nov 20 07:33:37 CST 2012)  https://code.google.com/p/arduino-pinchangeint/downloads/detail?name=pinchangeint-v2.19beta.zip https://code.google.com/p/arduino-pinchangeint/downloads/detail?name=pinchangeint-v2.19beta.zip
 		cppfix 
 		MemoryFree 
 

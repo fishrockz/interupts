@@ -6,8 +6,8 @@
 
 
 uint8_t latest_interrupted_pin;
-volatile uint16_t interrupt_count[100]={0}; // 20 possible arduino pins
-volatile uint16_t interrupt_start[100]={0}; // 20 possible arduino pins
+volatile uint16_t interrupt_count[100]={0}; // 100 possible arduino pins
+volatile uint16_t interrupt_start[100]={0}; // 100 possible arduino pins
 unsigned long timestart=0;
 //int16_t 
 // unThrottleInStart = TCNT1;
@@ -42,14 +42,16 @@ PID myPIDD(&Input, &Output, &Setpoint,2,5,1, DIRECT);
 
 
 void quicfunc() {
-	noInterrupts();
-	latest_interrupted_pin=PCintPort::arduinoPin;
+	  uint8_t sreg = SREG;
+  cli();
+	//latest_interrupted_pin=PCintPort::arduinoPin;
 	if(1==PCintPort::pinState){
-	  	interrupt_start[latest_interrupted_pin]=TCNT1;
+	  	interrupt_start[PCintPort::arduinoPin]=TCNT1;
 	 }else{
-		interrupt_count[latest_interrupted_pin]=(TCNT1-interrupt_start[latest_interrupted_pin])>>1;
+		interrupt_count[PCintPort::arduinoPin]=(TCNT1-interrupt_start[PCintPort::arduinoPin])>>1;
 	}
-	interrupts();
+	//interrupts();
+SREG = sreg;
 }
 
 void PCpin(int pin){
@@ -144,12 +146,12 @@ void loop() {
 			//interrupt_count[i]=0;
 			CRCArduinoFastServos::writeMicroseconds(SERVO_THROTTLE,1001);
 			CRCArduinoFastServos::writeMicroseconds(SERVO_AUX,1999);
-			
+			Serial.print("<< ");
 			Serial.print(i, DEC);
 			
 			Serial.print(" is ");
-			Serial.print(interrupt_count[i]);Serial.print(" ");Serial.print(interrupt_start[i]);
-			Serial.print(" ");
+			Serial.print(interrupt_count[i]);//Serial.print(" ");Serial.print(interrupt_start[i]);
+			Serial.print(" >>");
 			
 		}
 		
