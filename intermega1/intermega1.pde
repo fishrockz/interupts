@@ -173,8 +173,12 @@ void loop() {
 	
 	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,int(Output1*4 + 1000.0));
 	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,int(Output2*4 + 1000.0));
-	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,int(Output3*4 + 1000.0));
-	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,int(Output4*4 + 1000.0));
+	//CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,int(Output3*4 + 1000.0));
+	//CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,int(Output4*4 + 1000.0));
+
+	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,interrupt_count[62]);
+	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);
+
 
 	Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
