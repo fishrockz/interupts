@@ -17,41 +17,46 @@ unsigned long timestart=0;
 #include <PID_v1.h>
 
 //Define Variables we'll be connecting to
-double Setpoint, Input, Output;
+double Setpoint1, Input1, Output1;
+double Setpoint2, Input2, Output2;
+double Setpoint3, Input3, Output3;
+double Setpoint4, Input4, Output4;
 
 //Specify the links and initial tuning parameters
-PID myPIDA(&Input, &Output, &Setpoint,2,5,1, DIRECT);
-PID myPIDB(&Input, &Output, &Setpoint,2,5,1, DIRECT);
-PID myPIDC(&Input, &Output, &Setpoint,2,5,1, DIRECT);
-PID myPIDD(&Input, &Output, &Setpoint,2,5,1, DIRECT);
+PID myPIDA(&Input1, &Output1, &Setpoint1,2,5,1, DIRECT);
+PID myPIDB(&Input2, &Output2, &Setpoint2,2,5,1, DIRECT);
+PID myPIDC(&Input3, &Output3, &Setpoint3,2,5,1, DIRECT);
+PID myPIDD(&Input4, &Output4, &Setpoint4,2,5,1, DIRECT);
 
 #include <RCArduinoFastLib.h>
 
 // Assign your channel out pins
-#define THROTTLE_OUT_PIN 5
-#define STEERING_OUT_PIN 4
-#define AUX_OUT_PIN 3
+#define chanel1_OUT_PIN PIN6
+#define chanel2_OUT_PIN PIN5
+#define chanel3_OUT_PIN PIN4
+#define chanel4_OUT_PIN PIN3
+#define chanel5_OUT_PIN PIN2
 
 // Assign servo indexes
-#define SERVO_THROTTLE 0
-#define SERVO_STEERING 1
-#define SERVO_AUX 2
-#define SERVO_FRAME_SPACE 3
+#define chanel1_INDEX 0
+#define chanel2_INDEX 1
+#define chanel3_INDEX 2
+#define chanel4_INDEX 3
+#define SERVO_FRAME_SPACE 4
 
 
 
 
 void quicfunc() {
-	  uint8_t sreg = SREG;
-  cli();
+	uint8_t sreg = SREG;
+	cli();
 	//latest_interrupted_pin=PCintPort::arduinoPin;
 	if(1==PCintPort::pinState){
 	  	interrupt_start[PCintPort::arduinoPin]=TCNT1;
 	 }else{
 		interrupt_count[PCintPort::arduinoPin]=(TCNT1-interrupt_start[PCintPort::arduinoPin])>>1;
 	}
-	//interrupts();
-SREG = sreg;
+	SREG = sreg;
 }
 
 void PCpin(int pin){
@@ -64,7 +69,7 @@ void PCpin(int pin){
 void setup() {
 	pinMode(13,OUTPUT);
 	digitalWrite(13, LOW);
-	pinMode(PIN2, INPUT);	
+	//pinMode(PIN2, INPUT);	
 	
 	//sensors
 	PCpin(A8);//62
@@ -85,7 +90,7 @@ void setup() {
 	PCpin(11);
 	
 	
-	Serial.begin(9600);
+	Serial.begin(115200);
 	Serial.println("---------------------------------------");
 	
 	/************ not needed as FastServos do this tooo
@@ -97,29 +102,36 @@ void setup() {
     
     
    //CRCArduinoFastServos::setup();
-  pinMode(THROTTLE_OUT_PIN,OUTPUT);
-  pinMode(STEERING_OUT_PIN,OUTPUT);
-  pinMode(AUX_OUT_PIN,OUTPUT);
-  CRCArduinoFastServos::attach(SERVO_THROTTLE,THROTTLE_OUT_PIN);
-  CRCArduinoFastServos::attach(SERVO_STEERING,STEERING_OUT_PIN);
-  CRCArduinoFastServos::attach(SERVO_AUX,AUX_OUT_PIN);
-  
-  // lets set a standard rate of 50 Hz by setting a frame space of 10 * 2000 = 3 Servos + 7 times 2000
-  CRCArduinoFastServos::setFrameSpaceA(SERVO_FRAME_SPACE,7*2000);
 
-  CRCArduinoFastServos::begin();
+
+	pinMode(chanel1_OUT_PIN,OUTPUT);
+	pinMode(chanel2_OUT_PIN,OUTPUT);
+	pinMode(chanel3_OUT_PIN,OUTPUT);
+	pinMode(chanel4_OUT_PIN,OUTPUT);
+
+
+
+	CRCArduinoFastServos::attach(chanel1_INDEX,chanel1_OUT_PIN);
+	CRCArduinoFastServos::attach(chanel2_INDEX,chanel2_OUT_PIN);
+	CRCArduinoFastServos::attach(chanel3_INDEX,chanel3_OUT_PIN);
+	CRCArduinoFastServos::attach(chanel4_INDEX,chanel4_OUT_PIN);
+
+
+	// lets set a standard rate of 50 Hz by setting a frame space of 10 * 2000 = 3 Servos + 7 times 2000
+	CRCArduinoFastServos::setFrameSpaceA(SERVO_FRAME_SPACE,6*2000);
+
+	CRCArduinoFastServos::begin();
 
 
 
   //initialize the variables we're linked to
-  Input = 10;
-  Setpoint = 150;
-
-  //turn the PID on
-  myPIDA.SetMode(AUTOMATIC);
-   myPIDB.SetMode(AUTOMATIC);
-    myPIDC.SetMode(AUTOMATIC);
-     myPIDD.SetMode(AUTOMATIC);
+	Input1 = Input2 = Input3 = Input4 = 10;
+	Setpoint1 = Setpoint2 = Setpoint3 = Setpoint4 = 150;
+	//turn the PID on
+	myPIDA.SetMode(AUTOMATIC);
+	myPIDB.SetMode(AUTOMATIC);
+	myPIDC.SetMode(AUTOMATIC);
+	myPIDD.SetMode(AUTOMATIC);
 }
 
 uint8_t i;
@@ -127,9 +139,9 @@ void loop() {
 	if(myPIDA.Compute())
 	{
 		Serial.print("pided ");
-		Serial.print(Output);
+		Serial.print(Output1);
 		Serial.print(" ");
-		Serial.println(Input);
+		Serial.println(Input1);
 	}
 	myPIDB.Compute();
 	myPIDC.Compute();
@@ -137,28 +149,39 @@ void loop() {
 	
 	uint16_t  count;
 	Serial.print(".");
-	delay(300);
+	delay(660);
 	Serial.print("Count for pin ");
 	for (i=0; i < 100; i++) {
-	
-		if (interrupt_count[i] != 0) {
-			count=interrupt_count[i];
-			//interrupt_count[i]=0;
-			CRCArduinoFastServos::writeMicroseconds(SERVO_THROTTLE,1001);
-			CRCArduinoFastServos::writeMicroseconds(SERVO_AUX,1999);
+		count=interrupt_count[i];
+		if (count != 0) {
+			
+
 			Serial.print("<< ");
 			Serial.print(i, DEC);
-			
+		
 			Serial.print(" is ");
-			Serial.print(interrupt_count[i]);//Serial.print(" ");Serial.print(interrupt_start[i]);
+			Serial.print(count);//Serial.print(" ");Serial.print(interrupt_start[i]);
 			Serial.print(" >>");
 			
 		}
 		
 	}
-	Input = interrupt_count[52]/10;
+	Input1 = interrupt_count[62]/10;
+	Input2 = interrupt_count[63]/10;
+	Input3 = interrupt_count[64]/10;
+	Input4 = interrupt_count[65]/10;
 	
-	CRCArduinoFastServos::writeMicroseconds(SERVO_STEERING,interrupt_start[62]);
+	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,int(Output1*4 + 1000.0));
+	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,int(Output2*4 + 1000.0));
+	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,int(Output3*4 + 1000.0));
+	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,int(Output4*4 + 1000.0));
+
+	Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
+	Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
+	Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
+	Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
+
+
 	Serial.print(" \n");
 }
 
