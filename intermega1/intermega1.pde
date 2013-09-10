@@ -156,12 +156,12 @@ void loop() {
 		if (count != 0) {
 			
 
-			Serial.print("<< ");
+			Serial.print("{Setpoint(V ");
 			Serial.print(i, DEC);
 		
-			Serial.print(" is ");
+			Serial.print("),T, ");
 			Serial.print(count);//Serial.print(" ");Serial.print(interrupt_start[i]);
-			Serial.print(" >>");
+			Serial.print("} ");
 			
 		}
 		
