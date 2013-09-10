@@ -185,6 +185,13 @@ void loop() {
 	Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
 
+	Serial.print("{Setpoint(O 1),T, ");
+	Serial.print(int(Output1*4 + 1000.0));//Serial.print(" ");Serial.print(interrupt_start[i]);
+	Serial.print("} ");
+	Serial.print("{Setpoint(O 2),T, ");
+	Serial.print(int(Output2*4 + 1000.0));//Serial.print(" ");Serial.print(interrupt_start[i]);
+	Serial.print("} ");
+
 
 	Serial.print(" \n");
 }
