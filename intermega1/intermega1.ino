@@ -23,7 +23,7 @@ double Setpoint3, Input3, Output3;
 double Setpoint4, Input4, Output4;
 
 //Specify the links and initial tuning parameters
-PID myPIDA(&Input1, &Output1, &Setpoint1,2,5,1, DIRECT);
+PID myPIDA(&Input1, &Output1, &Setpoint1,1,0,0.1, DIRECT);
 PID myPIDB(&Input2, &Output2, &Setpoint2,2,5,1, DIRECT);
 PID myPIDC(&Input3, &Output3, &Setpoint3,2,5,1, DIRECT);
 PID myPIDD(&Input4, &Output4, &Setpoint4,2,5,1, DIRECT);
@@ -73,7 +73,7 @@ void setup() {
 	
 	//sensors
 	PCpin(A8);//62
-	PCpin(A9);
+	/*PCpin(A9);
 	PCpin(A10);
 	PCpin(A11);
 	PCpin(A12);
@@ -88,7 +88,7 @@ void setup() {
 	PCpin(53);
 	PCpin(10);
 	PCpin(11);
-	
+	*/
 	
 	Serial.begin(115200);
 	Serial.println("---------------------------------------");
@@ -149,7 +149,7 @@ void loop() {
 	
 	uint16_t  count;
 	Serial.print(".");
-	delay(660);
+	delay(100);
 	Serial.print("Count for pin ");
 	for (i=0; i < 100; i++) {
 		count=interrupt_count[i];
