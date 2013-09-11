@@ -24,9 +24,9 @@ double Setpoint4, Input4, Output4;
 
 //Specify the links and initial tuning parameters
 PID myPIDA(&Input1, &Output1, &Setpoint1,1,0,0.1, DIRECT);
-PID myPIDB(&Input2, &Output2, &Setpoint2,2,5,1, DIRECT);
-PID myPIDC(&Input3, &Output3, &Setpoint3,2,5,1, DIRECT);
-PID myPIDD(&Input4, &Output4, &Setpoint4,2,5,1, DIRECT);
+PID myPIDB(&Input2, &Output2, &Setpoint2,1,0,0.1, DIRECT);
+PID myPIDC(&Input3, &Output3, &Setpoint3,1,0,0.1, DIRECT);
+PID myPIDD(&Input4, &Output4, &Setpoint4,1,0,0.1, DIRECT);
 
 #include <RCArduinoFastLib.h>
 
@@ -92,16 +92,6 @@ void setup() {
 	
 	Serial.begin(115200);
 	Serial.println("---------------------------------------");
-	
-	/************ not needed as FastServos do this tooo
-	TCNT1 = 0;              // clear the timer count  
-
-    // Initilialise Timer1
-    TCCR1A = 0;             // normal counting mode 
-    TCCR1B = 2;     // set prescaler of 64 = 1 tick = 4us */
-    
-    
-   //CRCArduinoFastServos::setup();
 
 
 	pinMode(chanel1_OUT_PIN,OUTPUT);
@@ -124,10 +114,10 @@ void setup() {
 
 
 
-  //initialize the variables we're linked to
+	//initialize the variables we're linked to
 	Input1 = Input2 = Input3 = Input4 = 10;
 	Setpoint1 = Setpoint2 = Setpoint3 = Setpoint4 = 150;
-	//turn the PID on
+	//turn the PID's on
 	myPIDA.SetMode(AUTOMATIC);
 	myPIDB.SetMode(AUTOMATIC);
 	myPIDC.SetMode(AUTOMATIC);
@@ -160,7 +150,7 @@ void loop() {
 			Serial.print(i, DEC);
 		
 			Serial.print("),T, ");
-			Serial.print(count);//Serial.print(" ");Serial.print(interrupt_start[i]);
+			Serial.print(count);
 			Serial.print("} ");
 			
 		}
@@ -186,10 +176,10 @@ void loop() {
 	Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
 
 	Serial.print("{Setpoint(O 1),T, ");
-	Serial.print(int(Output1*4 + 1000.0));//Serial.print(" ");Serial.print(interrupt_start[i]);
+	Serial.print(int(Output1*4 + 1000.0));
 	Serial.print("} ");
 	Serial.print("{Setpoint(O 2),T, ");
-	Serial.print(int(Output2*4 + 1000.0));//Serial.print(" ");Serial.print(interrupt_start[i]);
+	Serial.print(int(Output2*4 + 1000.0));
 	Serial.print("} ");
 
 
