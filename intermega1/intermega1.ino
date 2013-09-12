@@ -126,21 +126,22 @@ void setup() {
 
 uint8_t i;
 void loop() {
-	if(myPIDA.Compute())
+	/*if(myPIDA.Compute())
 	{
 		Serial.print("pided ");
 		Serial.print(Output1);
 		Serial.print(" ");
 		Serial.println(Input1);
-	}
-	myPIDB.Compute();
+	}*/
+	myPIDA.Compute();
+        myPIDB.Compute();
 	myPIDC.Compute();
 	myPIDD.Compute();
 	
 	uint16_t  count;
-	Serial.print(".");
-	delay(100);
-	Serial.print("Count for pin ");
+	//Serial.print(".");
+	delay(5);
+	/*Serial.print("Count for pin ");
 	for (i=0; i < 100; i++) {
 		count=interrupt_count[i];
 		if (count != 0) {
@@ -155,7 +156,7 @@ void loop() {
 			
 		}
 		
-	}
+	}*/
 	Input1 = interrupt_count[62]/10;
 	Input2 = interrupt_count[63]/10;
 	Input3 = interrupt_count[64]/10;
@@ -170,7 +171,7 @@ void loop() {
 	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);
 
 
-	Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
+	/*Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
@@ -184,5 +185,6 @@ void loop() {
 
 
 	Serial.print(" \n");
+*/
 }
 
