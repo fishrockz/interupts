@@ -139,7 +139,7 @@ void loop() {
 	
 	uint16_t  count;
 	Serial.print(".");
-	delay(100);
+	delay(20);
 	Serial.print("Count for pin ");
 	for (i=0; i < 100; i++) {
 		count=interrupt_count[i];
@@ -161,13 +161,13 @@ void loop() {
 	Input3 = interrupt_count[64]/10;
 	Input4 = interrupt_count[65]/10;
 	
-	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,int(Output1*4 + 1000.0));
-	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,int(Output2*4 + 1000.0));
+	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,int(Output1*4 + 1000.0));//pin6
+	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,int(Output2*4 + 1000.0));//pin5
 	//CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,int(Output3*4 + 1000.0));
 	//CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,int(Output4*4 + 1000.0));
 
-	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,interrupt_count[62]);
-	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);
+	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,interrupt_count[62]);//pin4
+	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);//pin3
 
 
 	Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
