@@ -6,6 +6,11 @@
 
 
 uint8_t latest_interrupted_pin;
+uint16_t report_time;
+uint16_t work_time;
+uint16_t tmp_time;
+
+
 volatile uint16_t interrupt_count[100]={0}; // 100 possible arduino pins
 volatile uint16_t interrupt_start[100]={0}; // 100 possible arduino pins
 unsigned long timestart=0;
@@ -122,27 +127,19 @@ void setup() {
 	myPIDB.SetMode(AUTOMATIC);
 	myPIDC.SetMode(AUTOMATIC);
 	myPIDD.SetMode(AUTOMATIC);
+	report_time	= millis();
+	work_time	= millis();
 }
 
-uint8_t i;
-void loop() {
-	/*if(myPIDA.Compute())
-	{
-		Serial.print("pided ");
-		Serial.print(Output1);
-		Serial.print(" ");
-		Serial.println(Input1);
-	}*/
-	myPIDA.Compute();
-        myPIDB.Compute();
-	myPIDC.Compute();
-	myPIDD.Compute();
-	
-	uint16_t  count;
 
-	//Serial.print(".");
-	delay(5);
-	/*Serial.print("Count for pin ");
+
+
+
+void report(){
+	report_time	= millis();
+	uint16_t  count;
+	uint8_t i;
+	Serial.print("Count for pin ");
 	for (i=0; i < 100; i++) {
 		count=interrupt_count[i];
 		if (count != 0) {
@@ -157,22 +154,8 @@ void loop() {
 			
 		}
 		
-	}*/
-	Input1 = interrupt_count[62]/10;
-	Input2 = interrupt_count[63]/10;
-	Input3 = interrupt_count[64]/10;
-	Input4 = interrupt_count[65]/10;
-	
-	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,int(Output1*4 + 1000.0));//pin6
-	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,int(Output2*4 + 1000.0));//pin5
-	//CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,int(Output3*4 + 1000.0));
-	//CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,int(Output4*4 + 1000.0));
-
-	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,interrupt_count[62]);//pin4
-	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);//pin3
-
-
-	/*Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
+	}
+	Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
@@ -186,6 +169,47 @@ void loop() {
 
 
 	Serial.print(" \n");
-*/
 }
+
+void workloop(){
+
+	work_time	= millis();
+	
+	myPIDA.Compute();
+        myPIDB.Compute();
+	myPIDC.Compute();
+	myPIDD.Compute();
+	
+
+	Input1 = interrupt_count[62]/10;
+	Input2 = interrupt_count[63]/10;
+	Input3 = interrupt_count[64]/10;
+	Input4 = interrupt_count[65]/10;
+	
+	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,int(Output1*4 + 1000.0));//pin6
+	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,int(Output2*4 + 1000.0));//pin5
+	//CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,int(Output3*4 + 1000.0));
+	//CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,int(Output4*4 + 1000.0));
+
+	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,interrupt_count[62]);//pin4
+	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);//pin3
+
+}
+
+
+void loop() {
+	tmp_time=millis();
+	
+	if (tmp_time  >report_time+ 100){
+		report();
+	}
+	
+	if (tmp_time  >work_time+ 5){
+		workloop();
+	}
+}
+
+
+
+
 
