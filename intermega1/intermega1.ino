@@ -163,21 +163,21 @@ void report(){
 			Serial.print("} ");
 			
 		}
-		}
-		Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
-		Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
-		Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
-		Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
+	}
+	Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
+	Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
+	Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
+	Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
 
-		Serial.print("{Setpoint(O 1),T, ");
-		Serial.print(int(Output1*4 + 1000.0));
-		Serial.print("} ");
-		Serial.print("{Setpoint(O 2),T, ");
-		Serial.print(int(Output2*4 + 1000.0));
-		Serial.print("} ");
+	Serial.print("{Setpoint(O 1),T, ");
+	Serial.print(int(Output1*4 + 1000.0));
+	Serial.print("} ");
+	Serial.print("{Setpoint(O 2),T, ");
+	Serial.print(int(Output2*4 + 1000.0));
+	Serial.print("} ");
 
 
-		Serial.print(" \n");
+	Serial.print(" \n");
 
 }
 
@@ -219,11 +219,11 @@ void workloop(){
 void loop() {
 	tmp_time=millis();
 	
-	if (tmp_time  >report_time+ 100){
+	if (tmp_time  >report_time + 100){
 		report();
 	}
 	
-	if (tmp_time  >work_time+ 5){
+	if (tmp_time  >work_time + 5){
 		workloop();
 	}
 }
