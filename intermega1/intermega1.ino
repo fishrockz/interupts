@@ -6,6 +6,11 @@
 
 
 uint8_t latest_interrupted_pin;
+uint16_t report_time;
+uint16_t work_time;
+uint16_t tmp_time;
+
+
 volatile uint16_t interrupt_count[100]={0}; // 100 possible arduino pins
 volatile uint16_t interrupt_start[100]={0}; // 100 possible arduino pins
 unsigned long timestart=0;
@@ -24,9 +29,9 @@ double Setpoint4, Input4, Output4;
 
 //Specify the links and initial tuning parameters
 PID myPIDA(&Input1, &Output1, &Setpoint1,1,0,0.1, DIRECT);
-PID myPIDB(&Input2, &Output2, &Setpoint2,2,5,1, DIRECT);
-PID myPIDC(&Input3, &Output3, &Setpoint3,2,5,1, DIRECT);
-PID myPIDD(&Input4, &Output4, &Setpoint4,2,5,1, DIRECT);
+PID myPIDB(&Input2, &Output2, &Setpoint2,1,0,0.1, DIRECT);
+PID myPIDC(&Input3, &Output3, &Setpoint3,1,0,0.1, DIRECT);
+PID myPIDD(&Input4, &Output4, &Setpoint4,1,0,0.1, DIRECT);
 
 #include <RCArduinoFastLib.h>
 
@@ -44,6 +49,13 @@ PID myPIDD(&Input4, &Output4, &Setpoint4,2,5,1, DIRECT);
 #define chanel4_INDEX 3
 #define SERVO_FRAME_SPACE 4
 
+
+//
+double safe_distance=50; //value in cm
+double right_sonar, front_sonar, left_sonar, rear_sonar, bottom_sonar, top_sonar;
+
+double pitch_in, roll_in, throttle_in;
+int compd_pitch, compd_roll, compd_throttle;
 
 
 
@@ -92,16 +104,6 @@ void setup() {
 	
 	Serial.begin(115200);
 	Serial.println("---------------------------------------");
-	
-	/************ not needed as FastServos do this tooo
-	TCNT1 = 0;              // clear the timer count  
-
-    // Initilialise Timer1
-    TCCR1A = 0;             // normal counting mode 
-    TCCR1B = 2;     // set prescaler of 64 = 1 tick = 4us */
-    
-    
-   //CRCArduinoFastServos::setup();
 
 
 	pinMode(chanel1_OUT_PIN,OUTPUT);
@@ -124,32 +126,29 @@ void setup() {
 
 
 
-  //initialize the variables we're linked to
-	Input1 = Input2 = Input3 = Input4 = 10;
-	Setpoint1 = Setpoint2 = Setpoint3 = Setpoint4 = 150;
-	//turn the PID on
+	//initialize the variables we're linked to
+	Input1 = right_sonar;
+        Setpoint1 = safe_distance;
+        
+        Input2 = Input3 = Input4 = 10;
+	Setpoint2 = Setpoint3 = Setpoint4 = 150;
+	//turn the PID's on
 	myPIDA.SetMode(AUTOMATIC);
 	myPIDB.SetMode(AUTOMATIC);
 	myPIDC.SetMode(AUTOMATIC);
 	myPIDD.SetMode(AUTOMATIC);
+	report_time	= millis();
+	work_time	= millis();
 }
 
-uint8_t i;
-void loop() {
-	if(myPIDA.Compute())
-	{
-		Serial.print("pided ");
-		Serial.print(Output1);
-		Serial.print(" ");
-		Serial.println(Input1);
-	}
-	myPIDB.Compute();
-	myPIDC.Compute();
-	myPIDD.Compute();
-	
+
+
+
+
+void report(){
+	report_time	= millis();
 	uint16_t  count;
-	Serial.print(".");
-	delay(100);
+	uint8_t i;
 	Serial.print("Count for pin ");
 	for (i=0; i < 100; i++) {
 		count=interrupt_count[i];
@@ -160,39 +159,76 @@ void loop() {
 			Serial.print(i, DEC);
 		
 			Serial.print("),T, ");
-			Serial.print(count);//Serial.print(" ");Serial.print(interrupt_start[i]);
+			Serial.print(count);
 			Serial.print("} ");
 			
 		}
-		
 	}
-	Input1 = interrupt_count[62]/10;
-	Input2 = interrupt_count[63]/10;
-	Input3 = interrupt_count[64]/10;
-	Input4 = interrupt_count[65]/10;
-	
-	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,int(Output1*4 + 1000.0));
-	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,int(Output2*4 + 1000.0));
-	//CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,int(Output3*4 + 1000.0));
-	//CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,int(Output4*4 + 1000.0));
-
-	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,interrupt_count[62]);
-	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);
-
-
 	Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
 
 	Serial.print("{Setpoint(O 1),T, ");
-	Serial.print(int(Output1*4 + 1000.0));//Serial.print(" ");Serial.print(interrupt_start[i]);
+	Serial.print(int(Output1*4 + 1000.0));
 	Serial.print("} ");
 	Serial.print("{Setpoint(O 2),T, ");
-	Serial.print(int(Output2*4 + 1000.0));//Serial.print(" ");Serial.print(interrupt_start[i]);
+	Serial.print(int(Output2*4 + 1000.0));
 	Serial.print("} ");
 
 
 	Serial.print(" \n");
+
 }
+
+void workloop(){
+
+	work_time	= millis();
+
+	right_sonar= (interrupt_count[62]/10)/58; //value in cm
+	top_sonar= (interrupt_count[63]/10)/58; //value in cm
+	left_sonar= (interrupt_count[64]/10)/58; //value in cm
+	rear_sonar= (interrupt_count[65]/10)/58; //value in cm
+
+	Input1=right_sonar;
+	Input2=top_sonar;
+	Input3=left_sonar;
+	Input4=rear_sonar;
+
+// i think this should have the latist input data so have moved it to after the seting of the input vars
+	myPIDA.Compute();
+	myPIDB.Compute();
+	myPIDC.Compute();
+	myPIDD.Compute();
+
+	compd_pitch=constrain(pitch_in-map(Output1,0,30,0,1000)+map(Output2,0,30,0,1000),1000,2000);
+	//compd_roll=constrain(roll_in-map(Output3,0,30,0,1000)+map(Output4,0,30,0,1000),1000,2000);
+	
+	//this one might have to be a bit difrent in the final cut.
+	//compd_throttle=constrain(roll_in-map(Output5,0,30,0,1000)+map(Output6,0,30,0,1000),1000,2000);
+
+	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,compd_pitch);
+	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,compd_roll);
+
+	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,interrupt_count[62]);
+	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);
+
+}
+
+
+void loop() {
+	tmp_time=millis();
+	
+	if (tmp_time  >report_time + 100){
+		report();
+	}
+	
+	if (tmp_time  >work_time + 5){
+		workloop();
+	}
+}
+
+
+
+
 
