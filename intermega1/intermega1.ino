@@ -50,6 +50,13 @@ PID myPIDD(&Input4, &Output4, &Setpoint4,1,0,0.1, DIRECT);
 #define SERVO_FRAME_SPACE 4
 
 
+//
+double safe_distance=50; //value in cm
+double right_sonar, front_sonar, left_sonar, rear_sonar, bottom_sonar, top_sonar;
+
+double pitch_in, roll_in, throttle_in;
+int compd_pitch, compd_roll, compd_throttle;
+
 
 
 void quicfunc() {
@@ -120,8 +127,11 @@ void setup() {
 
 
 	//initialize the variables we're linked to
-	Input1 = Input2 = Input3 = Input4 = 10;
-	Setpoint1 = Setpoint2 = Setpoint3 = Setpoint4 = 150;
+	Input1 = right_sonar;
+        Setpoint1 = safe_distance;
+        
+        Input2 = Input3 = Input4 = 10;
+	Setpoint2 = Setpoint3 = Setpoint4 = 150;
 	//turn the PID's on
 	myPIDA.SetMode(AUTOMATIC);
 	myPIDB.SetMode(AUTOMATIC);
@@ -154,8 +164,47 @@ void report(){
 			
 		}
 		
+<<<<<<< HEAD
 	}
 	Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
+=======
+	}*/
+
+	right_sonar= (interrupt_count[62]/10)/58; //value in cm
+        top_sonar= (interrupt_count[63]/10)/58; //value in cm
+        left_sonar= (interrupt_count[64]/10)/58; //value in cm
+        rear_sonar= (interrupt_count[65]/10)/58; //value in cm
+        
+        Input1=right_sonar;
+        Input2=top_sonar;
+        Input3=left_sonar;
+        Input4=rear_sonar;
+        
+        /*Input1 = interrupt_count[62]/10;
+	Input2 = interrupt_count[63]/10;
+	Input3 = interrupt_count[64]/10;
+	Input4 = interrupt_count[65]/10;*/
+	
+        compd_pitch=constrain(pitch_in-map(Output1,0,30,0,1000),1000,2000);
+        //compd_roll=constrain(roll_in-map(Output2,0,30,0,1000),1000,2000);
+        //compd_throttle=constrain(roll_in-map(Output3,0,30,0,1000),1000,2000);
+
+	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,compd_pitch);
+	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,compd_roll);
+	//CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,compd_throttle);
+	//CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,int(Output4));
+
+        //CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,int(Output1*4 + 1000.0));
+	//CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,int(Output2*4 + 1000.0));
+	//CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,int(Output3*4 + 1000.0));
+	//CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,int(Output4*4 + 1000.0));
+
+	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,interrupt_count[62]);
+	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);
+
+
+	/*Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
+>>>>>>> 66ad5cc6813b45852d95103483c7de626985ec80
 	Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
 	Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
