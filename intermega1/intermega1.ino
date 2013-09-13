@@ -51,7 +51,7 @@ PID myPID_rear(&Input_rear, &Output_rear, &Setpoint_rear,1,0,0.1, DIRECT);
 
 
 //
-double safe_distance=50; //value in cm
+double safe_distance=20; //value in cm
 double right_sonar, front_sonar, left_sonar, rear_sonar, bottom_sonar, top_sonar;
 
 double pitch_in, roll_in, throttle_in, mode_switch;
@@ -149,7 +149,7 @@ void report(){
 	report_time	= millis();
 	uint16_t  count;
 	uint8_t i;
-	Serial.print("Count for pin ");
+	/*Serial.print("Count for pin ");
 	for (i=0; i < 100; i++) {
 		count=interrupt_count[i];
 		if (count != 0) {
@@ -163,12 +163,11 @@ void report(){
 			Serial.print("} ");
 			
 		}
-		}
-/*
+		}*/
+
 		Serial.print("{Output_right,T, ");
 		Serial.print(Output_right);
 		Serial.print("} ");
-*/
 /*
                 Serial.print("{Output_front,T, ");
 		Serial.print(Output_front);
@@ -187,7 +186,7 @@ void report(){
 		Serial.print("} ");
 */
                 Serial.print("{roll_in,T, ");
-		Serial.print(roll_in);
+		Serial.print(roll_in/20);
 		Serial.print("} ");
 /*
                 Serial.print("{throttle_in,T, ");
@@ -210,7 +209,6 @@ void report(){
 		Serial.print(rear_sonar);
 		Serial.print("} ");
 */
-/*
                 Serial.print("{safe_distance,T, ");
 		Serial.print(safe_distance);
 		Serial.print("} ");
@@ -220,7 +218,7 @@ void report(){
 		Serial.print("} ");
 */
                 Serial.print("{compd_roll,T, ");
-		Serial.print(compd_roll);
+		Serial.print(compd_roll/20);
 		Serial.print("} ");
 /*
                 Serial.print("{compd_throttle,T, ");
@@ -259,9 +257,10 @@ void workloop(){
 	myPID_left.Compute();
 	myPID_rear.Compute();
 
-	//compd_pitch=constrain(pitch_in+int(map(Output_front,0,30,0,1000)-map(Output_rear,0,30,0,1000),1000,2000);
-	compd_roll=constrain(roll_in+int(map(Output_right,0,30,0,1000)map(Output_left,0,30,0,1000)),1000,2000);
-	
+	//compd_pitch=constrain(pitch_in + int(map(Output_front,0,30,0,1000)-map(Output_rear,0,30,0,1000),1000,2000);
+	//compd_roll=constrain(roll_in + int(map(Output_right,0,30,0,1000) - map(Output_left,0,30,0,1000)),1000,2000);
+	compd_roll=constrain(roll_in-int(map(Output_right,0,30,0,1000)),1000,2000);
+
 	//this one might have to be a bit difrent in the final cut.
 	//compd_throttle=constrain(throttle_in-map(Output_top,0,30,0,1000)+map(Output_bottom,0,30,0,1000),1000,2000);
 
