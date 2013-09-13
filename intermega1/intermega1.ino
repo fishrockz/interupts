@@ -22,16 +22,16 @@ unsigned long timestart=0;
 #include <PID_v1.h>
 
 //Define Variables we'll be connecting to
-double Setpoint1, Input1, Output1;
-double Setpoint2, Input2, Output2;
-double Setpoint3, Input3, Output3;
-double Setpoint4, Input4, Output4;
+double Setpoint_right, Input_right, Output_right;
+double Setpoint_front, Input_front, Output_front;
+double Setpoint_left, Input_left, Output_left;
+double Setpoint_rear, Input_rear, Output_rear;
 
 //Specify the links and initial tuning parameters
-PID myPIDA(&Input1, &Output1, &Setpoint1,1,0,0.1, DIRECT);
-PID myPIDB(&Input2, &Output2, &Setpoint2,1,0,0.1, DIRECT);
-PID myPIDC(&Input3, &Output3, &Setpoint3,1,0,0.1, DIRECT);
-PID myPIDD(&Input4, &Output4, &Setpoint4,1,0,0.1, DIRECT);
+PID myPID_right(&Input_right, &Output_right, &Setpoint_right,1,0,0.1, DIRECT);
+PID myPID_front(&Input_front, &Output_front, &Setpoint_front,1,0,0.1, DIRECT);
+PID myPID_left(&Input_left, &Output_left, &Setpoint_left,1,0,0.1, DIRECT);
+PID myPID_rear(&Input_rear, &Output_rear, &Setpoint_rear,1,0,0.1, DIRECT);
 
 #include <RCArduinoFastLib.h>
 
@@ -54,7 +54,7 @@ PID myPIDD(&Input4, &Output4, &Setpoint4,1,0,0.1, DIRECT);
 double safe_distance=50; //value in cm
 double right_sonar, front_sonar, left_sonar, rear_sonar, bottom_sonar, top_sonar;
 
-double pitch_in, roll_in, throttle_in;
+double pitch_in, roll_in, throttle_in, mode_switch;
 int compd_pitch, compd_roll, compd_throttle;
 
 
@@ -94,11 +94,11 @@ void setup() {
 	PCpin(A15);//69
 	
 	//inputs
-	PCpin(50);
+	*/PCpin(50);
 	PCpin(51);
 	PCpin(52);
 	PCpin(53);
-	PCpin(10);
+	/*PCpin(10);
 	PCpin(11);
 	*/
 	
@@ -127,16 +127,16 @@ void setup() {
 
 
 	//initialize the variables we're linked to
-	Input1 = right_sonar;
-        Setpoint1 = safe_distance;
-        
-        Input2 = Input3 = Input4 = 10;
-	Setpoint2 = Setpoint3 = Setpoint4 = 150;
+	Input_right = right_sonar;
+                
+        Input_front = Input_left = Input_rear = 50;
+	Setpoint_right, Setpoint_front = Setpoint_left = Setpoint_rear = safe_distance;
+
 	//turn the PID's on
-	myPIDA.SetMode(AUTOMATIC);
-	myPIDB.SetMode(AUTOMATIC);
-	myPIDC.SetMode(AUTOMATIC);
-	myPIDD.SetMode(AUTOMATIC);
+	myPID_right.SetMode(AUTOMATIC);
+	myPID_front.SetMode(AUTOMATIC);
+	myPID_left.SetMode(AUTOMATIC);
+	myPID_rear.SetMode(AUTOMATIC);
 	report_time	= millis();
 	work_time	= millis();
 }
@@ -164,7 +164,7 @@ void report(){
 			
 		}
 		}
-		Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
+		/*Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
 		Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
 		Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
 		Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
@@ -175,6 +175,7 @@ void report(){
 		Serial.print("{Setpoint(O 2),T, ");
 		Serial.print(int(Output2*4 + 1000.0));
 		Serial.print("} ");
+                 */
 
 
 		Serial.print(" \n");
@@ -185,27 +186,32 @@ void workloop(){
 
 	work_time	= millis();
 
-	right_sonar= (interrupt_count[62]/10)/58; //value in cm
-	top_sonar= (interrupt_count[63]/10)/58; //value in cm
-	left_sonar= (interrupt_count[64]/10)/58; //value in cm
-	rear_sonar= (interrupt_count[65]/10)/58; //value in cm
-
-	Input1=right_sonar;
-	Input2=top_sonar;
-	Input3=left_sonar;
-	Input4=rear_sonar;
+	right_sonar= (interrupt_count[62])/58; //value in cm
+	front_sonar= (interrupt_count[63])/58; //value in cm
+	left_sonar= (interrupt_count[64])/58; //value in cm
+	rear_sonar= (interrupt_count[65])/58; //value in cm
+        pitch_in= (interrupt_count[50]);
+        roll_in= (interrupt_count[51]);
+        throttle_in= (interrupt_count[52]);
+        mode_switch= (interrupt_count[52]);
+        
+        
+	Input_right=right_sonar;
+	Input_front=front_sonar;
+	Input_left=left_sonar;
+	Input_rear=rear_sonar;
 
 // i think this should have the latist input data so have moved it to after the seting of the input vars
-	myPIDA.Compute();
-	myPIDB.Compute();
-	myPIDC.Compute();
-	myPIDD.Compute();
+	myPID_right.Compute();
+	myPID_front.Compute();
+	myPID_left.Compute();
+	myPID_rear.Compute();
 
-	compd_pitch=constrain(pitch_in-map(Output1,0,30,0,1000)+map(Output2,0,30,0,1000),1000,2000);
-	//compd_roll=constrain(roll_in-map(Output3,0,30,0,1000)+map(Output4,0,30,0,1000),1000,2000);
+	//compd_pitch=constrain(pitch_in-map(Output_front,0,30,0,1000)+map(Output_rear,0,30,0,1000),1000,2000);
+	compd_roll=constrain(roll_in-map(Output_right,0,30,0,1000)+map(Output_left,0,30,0,1000),1000,2000);
 	
 	//this one might have to be a bit difrent in the final cut.
-	//compd_throttle=constrain(roll_in-map(Output5,0,30,0,1000)+map(Output6,0,30,0,1000),1000,2000);
+	//compd_throttle=constrain(roll_in-map(Output_top,0,30,0,1000)+map(Output_bottom,0,30,0,1000),1000,2000);
 
 	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,compd_pitch);
 	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,compd_roll);
