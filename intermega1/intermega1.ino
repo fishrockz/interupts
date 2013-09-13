@@ -164,18 +164,70 @@ void report(){
 			
 		}
 		}
-		/*Serial.print(int(Output1*4 + 1000.0));Serial.print(" ");
-		Serial.print(int(Output2*4 + 1000.0));Serial.print(" ");
-		Serial.print(int(Output3*4 + 1000.0));Serial.print(" ");
-		Serial.print(int(Output4*4 + 1000.0));Serial.print(" ");
+/*
+		Serial.print("{Output_right,T, ");
+		Serial.print(Output_right);
+		Serial.print("} ");
+*/
+/*
+                Serial.print("{Output_front,T, ");
+		Serial.print(Output_front);
+		Serial.print("} ");
+                  
+                Serial.print("{Output_left,T, ");
+		Serial.print(Output_left);
+		Serial.print("} ");
 
-		Serial.print("{Setpoint(O 1),T, ");
-		Serial.print(int(Output1*4 + 1000.0));
+                Serial.print("{Output_rear,T, ");
+		Serial.print(Output_rear);
 		Serial.print("} ");
-		Serial.print("{Setpoint(O 2),T, ");
-		Serial.print(int(Output2*4 + 1000.0));
+
+		Serial.print("{pitch_in,T, ");
+		Serial.print(pitch_in);
 		Serial.print("} ");
-                 */
+*/
+                Serial.print("{roll_in,T, ");
+		Serial.print(roll_in);
+		Serial.print("} ");
+/*
+                Serial.print("{throttle_in,T, ");
+		Serial.print(throttle_in);
+		Serial.print("} ");
+*/
+                Serial.print("{right_sonar,T, ");
+		Serial.print(right_sonar);
+		Serial.print("} ");
+/*
+                Serial.print("{front_sonar,T, ");
+		Serial.print(front_sonar);
+		Serial.print("} ");
+
+                Serial.print("{left_sonar,T, ");
+		Serial.print(left_sonar);
+		Serial.print("} ");
+
+                Serial.print("{rear_sonar,T, ");
+		Serial.print(rear_sonar);
+		Serial.print("} ");
+*/
+/*
+                Serial.print("{safe_distance,T, ");
+		Serial.print(safe_distance);
+		Serial.print("} ");
+/*
+                Serial.print("{compd_pitch,T, ");
+		Serial.print(compd_pitch);
+		Serial.print("} ");
+*/
+                Serial.print("{compd_roll,T, ");
+		Serial.print(compd_roll);
+		Serial.print("} ");
+/*
+                Serial.print("{compd_throttle,T, ");
+		Serial.print(compd_throttle;
+		Serial.print("} ");
+
+*/
 
 
 		Serial.print(" \n");
@@ -193,7 +245,7 @@ void workloop(){
         pitch_in= (interrupt_count[50]);
         roll_in= (interrupt_count[51]);
         throttle_in= (interrupt_count[52]);
-        mode_switch= (interrupt_count[52]);
+        mode_switch= (interrupt_count[53]);
         
         
 	Input_right=right_sonar;
@@ -207,17 +259,17 @@ void workloop(){
 	myPID_left.Compute();
 	myPID_rear.Compute();
 
-	//compd_pitch=constrain(pitch_in-map(Output_front,0,30,0,1000)+map(Output_rear,0,30,0,1000),1000,2000);
-	compd_roll=constrain(roll_in-map(Output_right,0,30,0,1000)+map(Output_left,0,30,0,1000),1000,2000);
+	//compd_pitch=constrain(pitch_in+int(map(Output_front,0,30,0,1000)-map(Output_rear,0,30,0,1000),1000,2000);
+	compd_roll=constrain(roll_in+int(map(Output_right,0,30,0,1000)map(Output_left,0,30,0,1000)),1000,2000);
 	
 	//this one might have to be a bit difrent in the final cut.
-	//compd_throttle=constrain(roll_in-map(Output_top,0,30,0,1000)+map(Output_bottom,0,30,0,1000),1000,2000);
+	//compd_throttle=constrain(throttle_in-map(Output_top,0,30,0,1000)+map(Output_bottom,0,30,0,1000),1000,2000);
 
 	CRCArduinoFastServos::writeMicroseconds(chanel1_INDEX,compd_pitch);
 	CRCArduinoFastServos::writeMicroseconds(chanel2_INDEX,compd_roll);
-
-	CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,interrupt_count[62]);
-	CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);
+        //CRCArduinoFastServos::writeMicroseconds(chanel3_INDEX,compd_throttle);
+	
+	//CRCArduinoFastServos::writeMicroseconds(chanel4_INDEX,interrupt_count[63]);
 
 }
 
