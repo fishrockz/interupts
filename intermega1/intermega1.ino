@@ -28,7 +28,7 @@ double Setpoint_left, Input_left, Output_left;
 double Setpoint_rear, Input_rear, Output_rear;
 
 //Specify the links and initial tuning parameters
-PID myPID_right(&Input_right, &Output_right, &Setpoint_right,0.9,0.5,0.25, DIRECT);
+PID myPID_right(&Input_right, &Output_right, &Setpoint_right,0.9,0.1,1.5, DIRECT);
 PID myPID_front(&Input_front, &Output_front, &Setpoint_front,1,0,0.1, DIRECT);
 PID myPID_left(&Input_left, &Output_left, &Setpoint_left,1,0,0.1, DIRECT);
 PID myPID_rear(&Input_rear, &Output_rear, &Setpoint_rear,1,0,0.1, DIRECT);
@@ -51,7 +51,7 @@ PID myPID_rear(&Input_rear, &Output_rear, &Setpoint_rear,1,0,0.1, DIRECT);
 
 
 //
-double safe_distance=60; //value in cm
+double safe_distance=130; //value in cm
 double right_sonar, front_sonar, left_sonar, rear_sonar, bottom_sonar, top_sonar;
 
 double pitch_in, roll_in, throttle_in, mode_switch;
@@ -238,7 +238,8 @@ void workloop(){
 
 	work_time	= millis();
 
-	right_sonar= (interrupt_count[62])/58; //value in cm
+	//right_sonar= (interrupt_count[62])/58; //value in cm
+        right_sonar= (interrupt_count[62])/10; //RC emulation sonar
 	front_sonar= (interrupt_count[63])/58; //value in cm
 	left_sonar= (interrupt_count[64])/58; //value in cm
 	rear_sonar= (interrupt_count[65])/58; //value in cm
