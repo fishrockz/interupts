@@ -81,11 +81,9 @@ PID myPID_rear(&Input_rear, &Output_rear, &Setpoint_rear,1,0,0.1, DIRECT);
 
 
 //
-<<<<<<< HEAD
+
 double safe_distance=1500; //value in cm
-=======
-double safe_distance=130; //value in cm
->>>>>>> 54a108210ccc36dacee77369adc017a003ac5904
+
 double right_sonar, front_sonar, left_sonar, rear_sonar, bottom_sonar, top_sonar;
 
 double pitch_in, roll_in, throttle_in, mode_switch;
