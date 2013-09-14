@@ -165,6 +165,7 @@ void report(){
 			Serial.print("} ");
 			
 		}
+
 		}*/
 
 		Serial.print("{Output_right,T, ");
@@ -230,7 +231,7 @@ void report(){
 */
 
 
-		Serial.print(" \n");
+	Serial.print(" \n");
 
 }
 
@@ -279,11 +280,13 @@ void workloop(){
 void loop() {
 	tmp_time=millis();
 	
+
 	if (tmp_time  >report_time+ 50){
+
 		report();
 	}
 	
-	if (tmp_time  >work_time+ 5){
+	if (tmp_time  >work_time + 5){
 		workloop();
 	}
 }
