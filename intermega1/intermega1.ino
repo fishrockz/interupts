@@ -28,7 +28,7 @@ double Setpoint_left, Input_left, Output_left;
 double Setpoint_rear, Input_rear, Output_rear;
 
 //Specify the links and initial tuning parameters
-PID myPID_right(&Input_right, &Output_right, &Setpoint_right,1,0,0.1, DIRECT);
+PID myPID_right(&Input_right, &Output_right, &Setpoint_right,0.9,0.5,0.25, DIRECT);
 PID myPID_front(&Input_front, &Output_front, &Setpoint_front,1,0,0.1, DIRECT);
 PID myPID_left(&Input_left, &Output_left, &Setpoint_left,1,0,0.1, DIRECT);
 PID myPID_rear(&Input_rear, &Output_rear, &Setpoint_rear,1,0,0.1, DIRECT);
@@ -51,7 +51,7 @@ PID myPID_rear(&Input_rear, &Output_rear, &Setpoint_rear,1,0,0.1, DIRECT);
 
 
 //
-double safe_distance=20; //value in cm
+double safe_distance=60; //value in cm
 double right_sonar, front_sonar, left_sonar, rear_sonar, bottom_sonar, top_sonar;
 
 double pitch_in, roll_in, throttle_in, mode_switch;
@@ -127,10 +127,12 @@ void setup() {
 
 
 	//initialize the variables we're linked to
-	Input_right = right_sonar;
-                
-        Input_front = Input_left = Input_rear = 50;
-	Setpoint_right, Setpoint_front = Setpoint_left = Setpoint_rear = safe_distance;
+	Input_right = right_sonar;      
+        Input_front = front_sonar;
+        Input_left = left_sonar;
+        Input_rear = rear_sonar;
+        
+	Setpoint_right= Setpoint_front = Setpoint_left = Setpoint_rear = safe_distance;
 
 	//turn the PID's on
 	myPID_right.SetMode(AUTOMATIC);
@@ -186,7 +188,7 @@ void report(){
 		Serial.print("} ");
 */
                 Serial.print("{roll_in,T, ");
-		Serial.print(roll_in/20);
+		Serial.print(roll_in/10);
 		Serial.print("} ");
 /*
                 Serial.print("{throttle_in,T, ");
@@ -209,8 +211,8 @@ void report(){
 		Serial.print(rear_sonar);
 		Serial.print("} ");
 */
-                Serial.print("{safe_distance,T, ");
-		Serial.print(safe_distance);
+                Serial.print("{Setpoint_right,T, ");
+		Serial.print(Setpoint_right);
 		Serial.print("} ");
 /*
                 Serial.print("{compd_pitch,T, ");
@@ -218,7 +220,7 @@ void report(){
 		Serial.print("} ");
 */
                 Serial.print("{compd_roll,T, ");
-		Serial.print(compd_roll/20);
+		Serial.print(compd_roll/10);
 		Serial.print("} ");
 /*
                 Serial.print("{compd_throttle,T, ");
@@ -276,7 +278,7 @@ void workloop(){
 void loop() {
 	tmp_time=millis();
 	
-	if (tmp_time  >report_time+ 100){
+	if (tmp_time  >report_time+ 50){
 		report();
 	}
 	
